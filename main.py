@@ -71,20 +71,24 @@ def sixToEight(binStr):
 def sdes(block, keys):
     if len(keys) == 0:
         return block
+    else:
+        ln = block[:len(block) // 2]
+        rn = block[len(block) // 2:]
 
-    ln = block[:len(block) // 2]
-    rn = block[len(block) // 2:]
+        perm = sixToEight(rn);
 
-    perm = sixToEight(rn);
+        xor1 = xor(perm, keys.pop(0))
 
-    xor1 = xor(perm, keys.pop(0))
+        sub = s_box[1][xor1[0:4]] + s_box[2][xor1[4:9]]
 
-    sub = s_box[1][xor1[0:4]] + s_box[2][xor1[4:9]]
+        newrn = xor(sub, ln)
 
-    newrn = xor(sub, ln)
+        newblock = rn+newrn
 
-    newblock = rn+newrn
-    sdes(newblock, keys)
+        return sdes(newblock, keys)
+
+
+
 
 
 
@@ -96,10 +100,11 @@ def sdes(block, keys):
 
 # main method
 def __main__():
-    round_keys = generate_round_keys("110110111", 4)
+    round_keys = generate_round_keys("111010110", 4)
     # print(round_keys)
-    result = sdes('011101011010', round_keys)
-    print(result)
+    ct = sdes('101101110101', round_keys)
+    print(ct == '010101110111')
+
 
 
 __main__()
